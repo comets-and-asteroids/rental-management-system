@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=NAaksmdkma221adsdDSAd  # Move this here for the relevant service
+    depends_on:
+      - users-service
+      - properties-service
+      - bookings-service
+
+  users-service:
+    build:
+      context: ./users-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/users
+    depends_on:
+      - mongo
+
+  properties-service:
+    build:
+      context: ./properties-service
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/properties
+    depends_on:
+      - mongo
+
+  bookings-service:
+    build:
+      context: ./bookings-service
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/bookings
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+     context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
